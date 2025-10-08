@@ -1,23 +1,24 @@
-# auth.py
 from datetime import datetime, timedelta
 from typing import Optional
+import os
 
 from fastapi import Depends, HTTPException, status, APIRouter
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
+from dotenv import load_dotenv
 
 from . import models, schemas, database
 
-
 # ========================================================
-# CONFIGURATION DE BASE
+# CHARGER LES VARIABLES D'ENVIRONNEMENT
 # ========================================================
+load_dotenv()  # charge le .env
 
-SECRET_KEY = "TON_SECRET_SUPER_SECURISÉ"  # ⚠️ à mettre dans .env plus tard
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60  # durée du token
+SECRET_KEY = os.getenv("SECRET_KEY")  # depuis le .env
+ALGORITHM = os.getenv("ALGORITHM", "HS256")  # valeur par défaut HS256 si absent
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 60))
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
@@ -84,7 +85,6 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 # ========================================================
 # ROUTES D'AUTHENTIFICATION
 # ========================================================
-
 @router.post("/signup", response_model=schemas.JoueurResponse)
 def signup(joueur: schemas.JoueurCreate, db: Session = Depends(database.SessionLocal)):
     """Créer un nouveau joueur"""
