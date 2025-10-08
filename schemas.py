@@ -1,11 +1,10 @@
-# schemas.py
 from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 from datetime import date
 from datetime import datetime
 
 
-# ===================== SALLES =====================
+# Salles
 class SalleBase(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
@@ -23,7 +22,7 @@ class SalleResponse(SalleBase):
         orm_mode = True
 
 
-# ===================== ENIGMES =====================
+# Enigmes
 class EnigmeBase(BaseModel):
     name: str
     description: Optional[str] = None
@@ -43,7 +42,7 @@ class EnigmeResponse(EnigmeBase):
         orm_mode = True
 
 
-# ===================== MEDICAMENTS =====================
+# Medicaments
 class MedicamentBase(BaseModel):
     name: str
     composition_1: Optional[str] = None
@@ -62,7 +61,7 @@ class MedicamentResponse(MedicamentBase):
         orm_mode = True
 
 
-# ===================== MALADIES =====================
+# Maladies
 class MaladieBase(BaseModel):
     name: str
     symptome_1: Optional[str] = None
@@ -85,7 +84,7 @@ class MaladieResponse(MaladieBase):
         orm_mode = True
 
 
-# ===================== PARTIE =====================
+# Partie
 class PartieBase(BaseModel):
     nombre_joueurs: Optional[int] = None
     etat_sante: Optional[str] = None
@@ -106,7 +105,7 @@ class PartieResponse(PartieBase):
         orm_mode = True
 
 
-# ===================== JOUEURS =====================
+# Joueurs
 class JoueurBase(BaseModel):
     username: str
     email: Optional[EmailStr] = None
@@ -125,7 +124,7 @@ class JoueurResponse(JoueurBase):
         orm_mode = True
 
 
-# ===================== REPONSES =====================
+# Reponses
 class ReponseBase(BaseModel):
     reponse_saisie: Optional[str] = None
     date_reponse: Optional[date] = None
@@ -145,7 +144,7 @@ class ReponseResponse(ReponseBase):
         orm_mode = True
 
 
-# ===================== TOKEN (AUTH) =====================
+# Token (auth)
 class Token(BaseModel):
     access_token: str
     token_type: str

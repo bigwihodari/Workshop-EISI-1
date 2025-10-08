@@ -13,9 +13,9 @@ app = FastAPI(title="Escape Game API", version="1.0")
 app.include_router(auth.router)
 
 
-# ============================
+
 # DÉPENDANCE BASE DE DONNÉES
-# ============================
+
 def get_db():
     db = database.SessionLocal()
     try:
@@ -24,9 +24,9 @@ def get_db():
         db.close()
 
 
-# ======================================================
-# ==================== SALLES ==========================
-# ======================================================
+
+# SALLES
+
 @app.get("/salles", response_model=List[schemas.SalleResponse])
 def get_salles(db: Session = Depends(get_db)):
     return db.query(models.Salles).all()
@@ -74,9 +74,9 @@ def delete_salle(id: int, db: Session = Depends(get_db),
     return {"message": "Salle supprimée"}
 
 
-# ======================================================
-# ==================== ENIGMES =========================
-# ======================================================
+
+# ENIGMES
+
 @app.get("/enigmes", response_model=List[schemas.EnigmeResponse])
 def get_enigmes(db: Session = Depends(get_db)):
     return db.query(models.Enigme).all()
@@ -116,9 +116,9 @@ def delete_enigme(id: int, db: Session = Depends(get_db),
     return {"message": "Enigme supprimée"}
 
 
-# ======================================================
-# ==================== MEDICAMENTS =====================
-# ======================================================
+
+# MEDICAMENTS 
+
 @app.get("/medicaments", response_model=List[schemas.MedicamentResponse])
 def get_medicaments(db: Session = Depends(get_db)):
     return db.query(models.Medicaments).all()
@@ -158,9 +158,9 @@ def delete_medicament(id: int, db: Session = Depends(get_db),
     return {"message": "Médicament supprimé"}
 
 
-# ======================================================
-# ==================== MALADIES ========================
-# ======================================================
+
+# MALADIES 
+
 @app.get("/maladies", response_model=List[schemas.MaladieResponse])
 def get_maladies(db: Session = Depends(get_db)):
     return db.query(models.Maladies).all()
@@ -200,9 +200,9 @@ def delete_maladie(id: int, db: Session = Depends(get_db),
     return {"message": "Maladie supprimée"}
 
 
-# ======================================================
-# ==================== PARTIE ==========================
-# ======================================================
+
+# PARTIE
+
 @app.get("/parties", response_model=List[schemas.PartieResponse])
 def get_parties(db: Session = Depends(get_db)):
     return db.query(models.Partie).all()
@@ -242,9 +242,9 @@ def delete_partie(id: int, db: Session = Depends(get_db),
     return {"message": "Partie supprimée"}
 
 
-# ======================================================
-# ==================== JOUEURS =========================
-# ======================================================
+
+# JOUEURS 
+
 @app.get("/joueurs", response_model=List[schemas.JoueurResponse])
 def get_joueurs(db: Session = Depends(get_db)):
     return db.query(models.Joueurs).all()
@@ -269,18 +269,18 @@ def delete_joueur(id: int, db: Session = Depends(get_db),
     return {"message": "Joueur supprimé"}
 
 
-# ======================================================
-# ==================== REPONSES ========================
-# ======================================================
+
+# REPONSES
+
 @app.get("/reponses", response_model=List[schemas.ReponseResponse])
 def get_reponses(db: Session = Depends(get_db)):
-    return db.query(models.Reponses).all()
+    return db.query(models.Responses).all()
 
 
 @app.post("/reponses", response_model=schemas.ReponseResponse)
 def create_reponse(resp: schemas.ReponseCreate, db: Session = Depends(get_db),
                    current_user: schemas.JoueurResponse = Depends(auth.get_current_user)):
-    new_resp = models.Reponses(**resp.dict())
+    new_resp = models.Responses(**resp.dict())
     db.add(new_resp)
     db.commit()
     db.refresh(new_resp)
@@ -290,7 +290,7 @@ def create_reponse(resp: schemas.ReponseCreate, db: Session = Depends(get_db),
 @app.put("/reponses/{id}", response_model=schemas.ReponseResponse)
 def update_reponse(id: int, updated: schemas.ReponseCreate, db: Session = Depends(get_db),
                    current_user: schemas.JoueurResponse = Depends(auth.get_current_user)):
-    resp = db.query(models.Reponses).filter(models.Reponses.id_resp == id).first()
+    resp = db.query(models.Responses).filter(models.Responses.id_resp == id).first()
     if not resp:
         raise HTTPException(status_code=404, detail="Réponse introuvable")
     for k, v in updated.dict().items():
@@ -303,7 +303,7 @@ def update_reponse(id: int, updated: schemas.ReponseCreate, db: Session = Depend
 @app.delete("/reponses/{id}")
 def delete_reponse(id: int, db: Session = Depends(get_db),
                    current_user: schemas.JoueurResponse = Depends(auth.get_current_user)):
-    resp = db.query(models.Reponses).filter(models.Reponses.id_resp == id).first()
+    resp = db.query(models.Responses).filter(models.Responses.id_resp == id).first()
     if not resp:
         raise HTTPException(status_code=404, detail="Réponse introuvable")
     db.delete(resp)

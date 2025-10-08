@@ -11,13 +11,13 @@ from dotenv import load_dotenv
 
 from . import models, schemas, database
 
-# ========================================================
-# CHARGER LES VARIABLES D'ENVIRONNEMENT
-# ========================================================
-load_dotenv()  # charge le .env
 
-SECRET_KEY = os.getenv("SECRET_KEY")  # depuis le .env
-ALGORITHM = os.getenv("ALGORITHM", "HS256")  # valeur par défaut HS256 si absent
+# LES VARIABLES D'ENVIRONNEMENT
+
+load_dotenv() 
+
+SECRET_KEY = os.getenv("SECRET_KEY") 
+ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 60))
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -26,9 +26,9 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 router = APIRouter(tags=["Authentification"])
 
 
-# ========================================================
-# OUTILS DE SÉCURITÉ (hachage et vérification)
-# ========================================================
+
+# hachage et vérification
+
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
@@ -37,9 +37,9 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-# ========================================================
+
 # GESTION DES TOKENS
-# ========================================================
+
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
     expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
@@ -60,9 +60,9 @@ def verify_token(token: str):
         raise HTTPException(status_code=401, detail="Token invalide ou expiré")
 
 
-# ========================================================
+
 # UTILITAIRES UTILISATEUR
-# ========================================================
+
 def get_user_by_username(db: Session, username: str):
     return db.query(models.Joueurs).filter(models.Joueurs.username == username).first()
 
@@ -82,9 +82,9 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     return user
 
 
-# ========================================================
+
 # ROUTES D'AUTHENTIFICATION
-# ========================================================
+
 @router.post("/signup", response_model=schemas.JoueurResponse)
 def signup(joueur: schemas.JoueurCreate, db: Session = Depends(database.SessionLocal)):
     """Créer un nouveau joueur"""

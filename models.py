@@ -22,7 +22,7 @@ class Enigme(Base):
     type_enigme = Column(String(50), nullable=True)
     indice = Column(String(50), nullable=True)
     id_salle = Column(Integer, ForeignKey("salles.id_salle"), nullable=False)
-    salle = relationship("Salles", back_populates="enigmes")  # Correction ici
+    salle = relationship("Salles", back_populates="enigmes") 
 
 
 
@@ -90,5 +90,5 @@ class Responses(Base):
     id_salle = Column(Integer, ForeignKey("salles.id_salle"), nullable=False)
     id_joueur = Column(Integer, ForeignKey("joueurs.id_joueur"), nullable=False)
 
-    salle = relationship("Salles", back_populates="responses")  # Correction ici
+    salle = relationship("Salles", back_populates="responses") 
     joueur = relationship("Joueurs", back_populates="responses")
