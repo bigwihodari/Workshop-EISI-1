@@ -11,12 +11,10 @@ from dotenv import load_dotenv
 
 from . import models, schemas, database
 
+# Charger les variables d'environnement
+load_dotenv()
 
-# LES VARIABLES D'ENVIRONNEMENT
-
-load_dotenv() 
-
-SECRET_KEY = os.getenv("SECRET_KEY") 
+SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 60))
 
@@ -25,10 +23,16 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 router = APIRouter(tags=["Authentification"])
 
+# Dépendance DB (importée depuis database.py)
+def get_db():
+    db = database.SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
-# hachage et vérification
-
+# Vérification / hachage
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
@@ -37,9 +41,7 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-
-# GESTION DES TOKENS
-
+# Gestion du token JWT
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
     expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
@@ -49,7 +51,6 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
 
 
 def verify_token(token: str):
-    """Décoder et vérifier le token JWT"""
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
@@ -60,9 +61,7 @@ def verify_token(token: str):
         raise HTTPException(status_code=401, detail="Token invalide ou expiré")
 
 
-
-# UTILITAIRES UTILISATEUR
-
+# Gestion utilisateur
 def get_user_by_username(db: Session, username: str):
     return db.query(models.Joueurs).filter(models.Joueurs.username == username).first()
 
@@ -74,7 +73,7 @@ def authenticate_user(db: Session, username: str, password: str):
     return user
 
 
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(database.SessionLocal)):
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     username = verify_token(token)
     user = get_user_by_username(db, username)
     if user is None:
@@ -82,11 +81,9 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     return user
 
 
-
-# ROUTES D'AUTHENTIFICATION
-
+# Routes d'authentification
 @router.post("/signup", response_model=schemas.JoueurResponse)
-def signup(joueur: schemas.JoueurCreate, db: Session = Depends(database.SessionLocal)):
+def signup(joueur: schemas.JoueurCreate, db: Session = Depends(get_db)):
     """Créer un nouveau joueur"""
     existing_user = db.query(models.Joueurs).filter(models.Joueurs.username == joueur.username).first()
     if existing_user:
@@ -106,7 +103,7 @@ def signup(joueur: schemas.JoueurCreate, db: Session = Depends(database.SessionL
 
 
 @router.post("/login", response_model=schemas.Token)
-def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(database.SessionLocal)):
+def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     """Connexion et génération du JWT"""
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
@@ -118,5 +115,5 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 
 @router.get("/me", response_model=schemas.JoueurResponse)
 def read_users_me(current_user: schemas.JoueurResponse = Depends(get_current_user)):
-    """Route protégée : récupérer les infos du joueur connecté"""
+    """Récupérer les infos du joueur connecté"""
     return current_user

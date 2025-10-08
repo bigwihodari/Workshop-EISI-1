@@ -72,7 +72,7 @@ class Joueurs(Base):
     id_joueur = Column(Integer, primary_key=True, index=True)
     username = Column(String(50), nullable=False)
     email = Column(String(50), nullable=True)
-    password = Column(String(50), nullable=False)
+    password = Column(String(250), nullable=False)
     score = Column(Integer, nullable=True)
     id_game = Column(Integer, ForeignKey("partie.id_game"), nullable=True)
     partie = relationship("Partie", back_populates="joueurs")
