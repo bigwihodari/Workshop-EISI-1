@@ -2,6 +2,7 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 from datetime import date
+from datetime import datetime
 
 
 # ===================== SALLES =====================
@@ -88,8 +89,8 @@ class MaladieResponse(MaladieBase):
 class PartieBase(BaseModel):
     nombre_joueurs: Optional[int] = None
     etat_sante: Optional[str] = None
-    date_debut: Optional[date] = None
-    date_fin: Optional[date] = None
+    date_debut: Optional[datetime] = None
+    date_fin: Optional[datetime] = None
     temps_restant: Optional[int] = None
     temperature: Optional[float] = None
 

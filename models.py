@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, DECIMAL, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Date, DECIMAL, Boolean, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from .database import Base
 
@@ -22,7 +22,7 @@ class Enigme(Base):
     type_enigme = Column(String(50), nullable=True)
     indice = Column(String(50), nullable=True)
     id_salle = Column(Integer, ForeignKey("salles.id_salle"), nullable=False)
-    salle = relationship("salles", back_populates="enigmes")
+    salle = relationship("Salles", back_populates="enigmes")  # Correction ici
 
 
 
@@ -50,9 +50,7 @@ class Maladies(Base):
     frequence_medoc = Column(Integer, nullable=True)
 
     id_medoc = Column(Integer, ForeignKey("medicaments.id_medoc"), nullable=False, unique=True)
-
     medicament = relationship("Medicaments", back_populates="maladie")
-
 
 
 class Partie(Base):
@@ -61,13 +59,11 @@ class Partie(Base):
     id_game = Column(Integer, primary_key=True, index=True)
     nombre_joueurs = Column(Integer, nullable=True)
     etat_sante = Column(String(50), nullable=True)
-    date_debut = Column(Date, nullable=True)
-    date_fin = Column(Date, nullable=True)
+    date_debut = Column(DateTime, nullable=True)
+    date_fin = Column(DateTime, nullable=True)
     temps_restant = Column(Integer, nullable=True)
     temperature = Column(DECIMAL(15, 2), nullable=True)
     joueurs = relationship("Joueurs", back_populates="partie")
-
-    
 
 
 class Joueurs(Base):
@@ -78,10 +74,10 @@ class Joueurs(Base):
     email = Column(String(50), nullable=True)
     password = Column(String(50), nullable=False)
     score = Column(Integer, nullable=True)
-    id_game = Column(Integer, ForeignKey("partie.id_partie"), nullable=True)
+    id_game = Column(Integer, ForeignKey("partie.id_game"), nullable=True)
     partie = relationship("Partie", back_populates="joueurs")
     responses = relationship("Responses", back_populates="joueur")
-    
+
 
 class Responses(Base):
     __tablename__ = "responses"
@@ -94,5 +90,5 @@ class Responses(Base):
     id_salle = Column(Integer, ForeignKey("salles.id_salle"), nullable=False)
     id_joueur = Column(Integer, ForeignKey("joueurs.id_joueur"), nullable=False)
 
-    salle = relationship("Salles", back_populates="reponses")
-    joueur = relationship("Joueurs", back_populates="reponses")
+    salle = relationship("Salles", back_populates="responses")  # Correction ici
+    joueur = relationship("Joueurs", back_populates="responses")
